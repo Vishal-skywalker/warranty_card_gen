@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vishal Das - Warranty Certificate</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Montserrat for high-end corporate typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b1120;
+      color: #1e293b;
+    }
+    .brand-font {
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Exact A4 dimensions for preview and printing */
+    .a4-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      height: 297mm;
+      background: #ffffff;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      box-sizing: border-box;
+    }
+
+    /* Print optimization */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .a4-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        display: block !important;
+      }
+      .a4-sheet {
+        width: 210mm !important;
+        height: 297mm !important;
+        min-height: 297mm !important;
+        max-height: 297mm !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        border: none !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+
+    /* Subtle inline editing styling */
+    [contenteditable="true"]:hover {
+      outline: 1.5px dashed #0284c7;
+      outline-offset: 3px;
+      border-radius: 4px;
+      cursor: text;
+    }
+    [contenteditable="true"]:focus {
+      outline: 2px solid #0284c7;
+      outline-offset: 3px;
+      background-color: rgba(239, 246, 255, 0.7);
+      border-radius: 4px;
+    }
+
+    /* Realistic Rubber Stamp Effect */
+    .stamp-container {
+      transform: rotate(-5deg);
+      transition: transform 0.2s ease;
+      filter: drop-shadow(0 2px 4px rgba(2, 132, 199, 0.15));
+    }
+    .stamp-container:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-slate-800 flex flex-col antialiased">
+  <!-- Top Navigation / Toolbar -->
+  <header class="no-print bg-slate-900/95 backdrop-blur border-b border-slate-800 px-6 py-3.5 sticky top-0 z-50 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-sky-500/20">
+        <i data-lucide="shield-check" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <h1 class="text-white font-bold text-base tracking-tight flex items-center gap-2">
+          Ultra Proofing Plus
+          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800">Template</span>
+        </h1>
+        <p class="text-xs text-slate-400">Professional Clean Warranty Certificate</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button id="toggleSidebarBtn" class="lg:hidden px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center gap-2 border border-slate-700 transition">
+        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+        <span>Fields</span>
+      </button>
+
+      <button id="resetDefaultsBtn" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-lg flex items-center gap-2 border border-slate-700 transition">
+        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+        <span>Reset Defaults</span>
+      </button>
+
+      <button id="printBtn" class="px-5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-sky-500/25 flex items-center gap-2 transition active:scale-95">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        <span>Print / Save as PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+    <!-- Sidebar Controls -->
+    <aside id="editorSidebar" class="no-print w-full lg:w-[380px] bg-slate-900 border-r border-slate-800 p-5 overflow-y-auto max-h-[calc(100vh-65px)] space-y-5 flex-shrink-0">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2 text-sky-400 font-semibold text-sm">
+          <i data-lucide="sliders" class="w-4 h-4"></i>
+          <span>Certificate Settings</span>
+        </div>
+        <span class="text-[11px] text-slate-400 font-medium">Auto-synced</span>
+      </div>
+
+      <!-- Recipient & Document Meta -->
+      <div class="space-y-3.5">
+        <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Client & Issue Details</h3>
+        
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Issue Date</label>
+          <input type="text" id="inputDate" value="20th Sept, 2026" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Recipient / Client Name</label>
+          <input type="text" id="inputRecipient" value="Vishal Das" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Subject Title</label>
+          <input type="text" id="inputSubject" value="Warranty Certificate" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+        </div>
+      </div>
+
+      <!-- Company Contact Details -->
+      <div class="space-y-3.5 pt-2 border-t border-slate-800/80">
+        <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Company Contact Info</h3>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Phone Number</label>
+          <div class="relative">
+            <input type="text" id="inputPhone" value="8583039601" class="w-full text-xs pl-8 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+            <i data-lucide="phone" class="w-3.5 h-3.5 text-sky-400 absolute left-2.5 top-2.5"></i>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Location / Address</label>
+          <div class="relative">
+            <input type="text" id="inputLocation" value="Aerocity Mohali" class="w-full text-xs pl-8 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-sky-400 absolute left-2.5 top-2.5"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Warranty Content -->
+      <div class="space-y-3.5 pt-2 border-t border-slate-800/80">
+        <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Warranty Terms</h3>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Service Type</label>
+          <input type="text" id="inputServiceType" value="anti termite treatment services" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Warranty Duration</label>
+          <input type="text" id="inputWarrantyYears" value="05 (Five) years" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Vendor & Partnership Context</label>
+          <textarea id="inputVendorContext" rows="3" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition">We are here to inform you that we provide termite control services in northern parts of India.</textarea>
+        </div>
+      </div>
+
+      <!-- Stamp Configuration -->
+      <div class="space-y-3.5 pt-2 border-t border-slate-800/80">
+        <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Rubber Stamp Details</h3>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Stamp Top Arc</label>
+          <input type="text" id="inputStampTop" value="ULTRA PROOFING PLUS" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Stamp Bottom Arc</label>
+          <input type="text" id="inputStampBottom" value="AUTHENTIC SEAL" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Stamp Center Line 1</label>
+          <input type="text" id="inputStampCenter1" value="Aerocity" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Stamp Center Line 2</label>
+          <input type="text" id="inputStampCenter2" value="Mohali" class="w-full text-xs px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 transition" />
+        </div>
+      </div>
+
+      <div class="p-3 bg-sky-950/40 border border-sky-900/60 rounded-xl text-[11px] text-sky-300 flex items-start gap-2">
+        <i data-lucide="sparkles" class="w-4 h-4 flex-shrink-0 text-sky-400 mt-0.5"></i>
+        <span>Inline text is fully interactive: click directly on the certificate to rewrite text before saving or printing.</span>
+      </div>
+
+    </aside>
+
+    <!-- Certificate Viewer Container -->
+    <section class="a4-container flex-1 overflow-auto p-4 md:p-8 flex justify-center items-start bg-slate-950">
+      
+      <!-- The Printable A4 Sheet -->
+      <div id="certificateSheet" class="a4-sheet text-slate-800 select-text">
+
+        <!-- Top Section: Header Waves + Authentic Brand Logo + Clean Warranty Header -->
+        <div>
+          <!-- Top Elegant Flowing Wave Vector Graphics -->
+          <div class="relative w-full h-[125px] overflow-hidden">
+            <svg class="w-full h-full" viewBox="0 0 794 125" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="waveGradPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0284c7" />
+                  <stop offset="60%" stop-color="#0369a1" />
+                  <stop offset="100%" stop-color="#075985" />
+                </linearGradient>
+                <linearGradient id="waveGradAccent" x1="0%" y1="0%" x2="100%" y2="60%">
+                  <stop offset="0%" stop-color="#38bdf8" />
+                  <stop offset="100%" stop-color="#0284c7" />
+                </linearGradient>
+                <linearGradient id="waveGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#bae6fd" stop-opacity="0.8" />
+                  <stop offset="100%" stop-color="#e0f2fe" stop-opacity="0.25" />
+                </linearGradient>
+              </defs>
+
+              <!-- Left Side Dynamic Crest -->
+              <path d="M 0,0 L 250,0 C 170,40 105,75 0,105 Z" fill="url(#waveGradAccent)" />
+              <path d="M 0,0 L 210,0 C 145,50 65,80 0,125 Z" fill="url(#waveGradPrimary)" opacity="0.95" />
+              <path d="M 0,35 C 80,35 160,18 260,0 L 290,0 C 180,28 85,68 0,95 Z" fill="url(#waveGradLight)" />
+
+              <!-- Right Corner Subtle Finish -->
+              <path d="M 540,0 C 630,25 710,42 794,50 L 794,0 Z" fill="url(#waveGradAccent)" opacity="0.35" />
+              <path d="M 610,0 C 680,20 740,28 794,32 L 794,0 Z" fill="url(#waveGradPrimary)" opacity="0.85" />
+            </svg>
+          </div>
+
+          <!-- Exact Logo Reproduction from Uploaded Image -->
+          <div class="flex flex-col items-center -mt-9 px-12 relative z-10">
+            <div class="w-[380px] max-w-full">
+              <svg viewBox="0 0 540 145" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Left Sparkle Stars -->
+                <path d="M 94,22 L 96,14 L 102,12 L 96,10 L 94,2 L 92,10 L 86,12 L 92,14 Z" fill="#0284c7" />
+                <path d="M 112,14 L 113.5,8.5 L 119,7 L 113.5,5.5 L 112,0 L 110.5,5.5 L 105,7 L 110.5,8.5 Z" fill="#0284c7" />
+
+                <!-- House Roof & Chimney Outline -->
+                <!-- Chimney -->
+                <path d="M 76,58 L 76,34 L 88,34 L 88,48" stroke="#0284c7" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+                <!-- Slanted Roof Line -->
+                <path d="M 54,74 L 140,9 L 178,38" stroke="#0284c7" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+
+                <!-- Flowing Under-Wave beneath the house -->
+                <path d="M 8,87 C 80,85 115,50 178,54 C 180,54 182,54 184,54 C 115,58 75,93 8,87 Z" fill="#0284c7" />
+                <path d="M 8,87 C 95,85 125,56 182,54" stroke="#0284c7" stroke-width="4.5" stroke-linecap="round" />
+
+                <!-- ULTRA Text -->
+                <!-- U -->
+                <path d="M 205,25 L 205,58 C 205,68 212,74 223,74 C 234,74 241,68 241,58 L 241,25 L 228,25 L 228,57 C 228,61 226,63 223,63 C 220,63 218,61 218,57 L 218,25 L 205,25 Z" fill="#0f172a" />
+                <!-- L -->
+                <path d="M 251,25 L 251,74 L 282,74 L 282,63 L 264,63 L 264,25 L 251,25 Z" fill="#0f172a" />
+                <!-- T -->
+                <path d="M 288,25 L 288,36 L 302,36 L 302,74 L 315,74 L 315,36 L 329,36 L 329,25 L 288,25 Z" fill="#0f172a" />
+                <!-- R -->
+                <path d="M 336,25 L 336,74 L 349,74 L 349,57 L 358,57 L 368,74 L 383,74 L 371,55 C 379,52 383,46 383,39 C 383,29 375,25 363,25 L 336,25 Z M 349,36 L 361,36 C 367,36 370,38 370,43 C 370,48 367,50 361,50 L 349,50 L 349,36 Z" fill="#0f172a" />
+                <!-- A with droplet cutout -->
+                <path d="M 409,25 L 388,74 L 402,74 L 406.5,63 L 424,63 L 428.5,74 L 443,74 L 422,25 L 409,25 Z M 415.5,41.5 L 420.5,53.5 L 410.5,53.5 L 415.5,41.5 Z" fill="#0f172a" />
+                <!-- Blue Water Droplet inside 'A' -->
+                <path d="M 415.2,46 C 415.2,46 422,57 422,63 C 422,66.8 418.9,69.5 415.2,69.5 C 411.5,69.5 408.4,66.8 408.4,63 C 408.4,57 415.2,46 415.2,46 Z" fill="#0284c7" />
+
+                <!-- PROOFING Text (Sub-title) -->
+                <text x="312" y="103" text-anchor="middle" font-family="'Montserrat', sans-serif" font-weight="700" font-size="22" letter-spacing="14" fill="#475569">
+                  PROOFING
+                </text>
+
+                <!-- PLUS text flanked by lines -->
+                <line x1="120" y1="130" x2="242" y2="130" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" />
+                <text x="306" y="136" text-anchor="middle" font-family="'Montserrat', sans-serif" font-weight="800" font-size="20" letter-spacing="8" fill="#0284c7">
+                  PLUS
+                </text>
+                <line x1="370" y1="130" x2="492" y2="130" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" />
+              </svg>
+            </div>
+
+            <!-- Simplified, Modern, Elegant Warranty Certificate Header (No Heavy Ribbon) -->
+            <div class="w-full max-w-[580px] mt-6 flex items-center justify-center gap-4">
+              <div class="h-[1.5px] flex-1 bg-gradient-to-r from-transparent via-sky-500 to-sky-600 rounded"></div>
+              
+              <div class="flex items-center gap-2 px-3">
+                <span class="w-2 h-2 rounded-full bg-sky-600"></span>
+                <h2 id="certBannerTitle" contenteditable="true" class="brand-font text-[19px] sm:text-[21px] font-extrabold tracking-[0.24em] text-slate-900 uppercase">
+                  WARRANTY CERTIFICATE
+                </h2>
+                <span class="w-2 h-2 rounded-full bg-sky-600"></span>
+              </div>
+
+              <div class="h-[1.5px] flex-1 bg-gradient-to-l from-transparent via-sky-500 to-sky-600 rounded"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Middle Certificate Letter Content (100% Clean, No Watermark) -->
+        <div class="px-16 pt-7 pb-2 flex-1 flex flex-col justify-start relative z-10 text-[14px] leading-relaxed text-slate-800">
+          
+          <!-- Date right-aligned -->
+          <div class="flex justify-end mb-4">
+            <p class="font-medium text-slate-600 text-[13.5px]">
+              Date: <span id="certDate" contenteditable="true" class="font-semibold text-slate-900">20th Sept, 2026</span>
+            </p>
+          </div>
+
+          <!-- Recipient info -->
+          <div class="mb-4">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">To,</p>
+            <h3 id="certRecipient" contenteditable="true" class="text-[22px] font-bold text-sky-950 tracking-tight leading-snug">
+              Vishal Das
+            </h3>
+          </div>
+
+          <!-- Subject Line -->
+          <div class="mb-5 pb-2 border-b border-slate-100">
+            <p class="font-bold text-[14.5px] text-slate-900">
+              Subject: <span id="certSubject" contenteditable="true" class="text-sky-800 font-bold">Warranty Certificate</span>
+            </p>
+          </div>
+
+          <!-- Body Paragraphs matching corporate phrasing -->
+          <div class="space-y-4 text-[13.5px] text-slate-700 leading-relaxed font-normal text-justify">
+            <p>
+              This is to certify that we will provide <span id="certServiceType" contenteditable="true" class="font-semibold text-slate-900">anti termite treatment services</span> to the above mentioned site.
+            </p>
+
+            <p>
+              We here by give <span id="certWarrantyYears" contenteditable="true" class="font-bold text-slate-950">05 (Five) years</span> warranty and in case there is any attack of termite in the treated area during the warranty period. The same shall be treated again free of cost only in the effected area. <span id="certVendorContext" contenteditable="true">We are here to inform you that we provide termite control services in northern parts of India.</span>
+            </p>
+
+            <p id="certAssurance" contenteditable="true">
+              We assure you that we will provide you the best quality and timely services during our contract period.
+            </p>
+          </div>
+
+          <!-- Sign-Off, Phone Number, Location & Official Rubber Stamp -->
+          <div class="mt-auto pt-6 pb-2 flex items-end justify-between">
+            
+            <!-- Left Side: Sign off, Phone, Location -->
+            <div class="space-y-2">
+              <p class="text-xs text-slate-500 font-medium">Thanking you,</p>
+              <p class="text-xs text-slate-500 font-medium">Yours Sincerely,</p>
+              <p id="certSignatoryName" contenteditable="true" class="font-bold text-[17px] text-sky-950 leading-none pt-1 tracking-tight">
+                Ultra Proofing Plus
+              </p>
+              
+              <!-- Contact Details Block: Location & Phone -->
+              <div class="pt-3 space-y-1.5 text-slate-700 text-xs font-medium">
+                <!-- Location -->
+                <div class="flex items-center gap-2">
+                  <div class="w-5 h-5 rounded bg-sky-50 flex items-center justify-center text-sky-600 flex-shrink-0">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <span id="certLocation" contenteditable="true">Aerocity Mohali</span>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="flex items-center gap-2">
+                  <div class="w-5 h-5 rounded bg-sky-50 flex items-center justify-center text-sky-600 flex-shrink-0">
+                    <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <span class="font-semibold text-slate-900 flex items-center gap-1">
+                    Ph: <span id="certPhone" contenteditable="true" class="font-bold text-sky-900 tracking-wide">8583039601</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: High-Realism Corporate Rubber Stamp & Signature Line -->
+            <div class="flex flex-col items-center">
+              
+              <!-- Enhanced SVG Rubber Ink Stamp -->
+              <div class="w-36 h-36 relative mb-3 stamp-container select-none">
+                <svg class="w-full h-full text-sky-800" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Outer Solid Ring with slight ink bleed styling -->
+                  <circle cx="110" cy="110" r="102" stroke="currentColor" stroke-width="4.5" stroke-opacity="0.9" />
+                  <!-- Inner Fine Solid Ring -->
+                  <circle cx="110" cy="110" r="94" stroke="currentColor" stroke-width="1.8" stroke-opacity="0.8" />
+                  <!-- Inner Dashed Ring for authentic stamp texture -->
+                  <circle cx="110" cy="110" r="68" stroke="currentColor" stroke-width="2" stroke-dasharray="4 2.5" stroke-opacity="0.85" />
+                  <circle cx="110" cy="110" r="62" stroke="currentColor" stroke-width="1.5" stroke-opacity="0.9" />
+
+                  <!-- Top Curved Arc Path -->
+                  <defs>
+                    <path id="stampTopArc" d="M 28,110 A 82,82 0 1,1 192,110" />
+                    <path id="stampBottomArc" d="M 192,110 A 82,82 0 0,1 28,110" />
+                  </defs>
+
+                  <!-- Top Curved Text: ULTRA PROOFING PLUS -->
+                  <text fill="currentColor" font-size="12.5" font-family="'Montserrat', sans-serif" font-weight="900" letter-spacing="2.8" opacity="0.95">
+                    <textPath href="#stampTopArc" startOffset="50%" text-anchor="middle" id="certStampTopPath">
+                      ULTRA PROOFING PLUS
+                    </textPath>
+                  </text>
+
+                  <!-- Bottom Curved Text -->
+                  <text fill="currentColor" font-size="10.5" font-family="'Montserrat', sans-serif" font-weight="800" letter-spacing="3" opacity="0.9">
+                    <textPath href="#stampBottomArc" startOffset="50%" text-anchor="middle" id="certStampBottomPath">
+                      AUTHENTIC SEAL
+                    </textPath>
+                  </text>
+
+                  <!-- Left & Right 5-pointed Divider Stars -->
+                  <!-- Left Star -->
+                  <polygon points="26,110 28,104 34,103 29,99 31,93 26,97 21,93 23,99 18,103 24,104" fill="currentColor" opacity="0.9" />
+                  <!-- Right Star -->
+                  <polygon points="194,110 196,104 202,103 197,99 199,93 194,97 189,93 191,99 186,103 192,104" fill="currentColor" opacity="0.9" />
+
+                  <!-- Center Stamp Content: Inner Badge -->
+                  <circle cx="110" cy="110" r="38" fill="#f0f9ff" fill-opacity="0.5" stroke="currentColor" stroke-width="1.5" stroke-opacity="0.5" />
+
+                  <!-- Small Star inside center badge -->
+                  <polygon points="110,87 112,83 116,82.5 113,79.5 114,75 110,77.5 106,75 107,79.5 104,82.5 108,83" fill="currentColor" opacity="0.9" />
+
+                  <text x="110" y="104" fill="currentColor" text-anchor="middle" font-size="13" font-weight="800" font-family="'Inter', sans-serif" id="certStampCenter1">
+                    Aerocity
+                  </text>
+                  <text x="110" y="122" fill="currentColor" text-anchor="middle" font-size="13" font-weight="800" font-family="'Inter', sans-serif" id="certStampCenter2">
+                    Mohali
+                  </text>
+
+                  <text x="110" y="136" fill="currentColor" text-anchor="middle" font-size="8.5" font-weight="700" font-family="'Inter', sans-serif" opacity="0.75" letter-spacing="1">
+                    APPROVED
+                  </text>
+                </svg>
+              </div>
+
+              <!-- Signatory Signature Divider & Text -->
+              <div class="w-48 border-t-2 border-slate-700/80 my-1"></div>
+              <p id="certSignatoryTitle" contenteditable="true" class="text-[12px] font-semibold text-slate-700 uppercase tracking-wider">
+                Authorized Signatory
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Bottom Flowing Waves -->
+        <div class="relative w-full h-[75px] overflow-hidden -mt-1">
+          <svg class="w-full h-full" viewBox="0 0 794 75" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <!-- Left-to-Right Bottom Blue Sweeps -->
+            <path d="M 0,75 L 794,75 L 794,10 C 670,55 510,60 370,38 C 230,16 110,32 0,60 Z" fill="url(#waveGradAccent)" />
+            <path d="M 0,75 L 794,75 L 794,28 C 630,65 470,65 310,42 C 170,24 70,38 0,75 Z" fill="url(#waveGradPrimary)" />
+          </svg>
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    const updateDocumentTitle = (clientName) => {
+      const name = (clientName || '').trim() || 'Client';
+      document.title = `${name} - Warranty Certificate`;
+    };
+
+    // Field Bindings between Sidebar Inputs and Certificate Elements
+    const fieldBindings = [
+      { input: 'inputDate', cert: 'certDate' },
+      { input: 'inputRecipient', cert: 'certRecipient' },
+      { input: 'inputSubject', cert: 'certSubject' },
+      { input: 'inputPhone', cert: 'certPhone' },
+      { input: 'inputLocation', cert: 'certLocation' },
+      { input: 'inputServiceType', cert: 'certServiceType' },
+      { input: 'inputWarrantyYears', cert: 'certWarrantyYears' },
+      { input: 'inputVendorContext', cert: 'certVendorContext' },
+      { input: 'inputStampCenter1', cert: 'certStampCenter1' },
+      { input: 'inputStampCenter2', cert: 'certStampCenter2' }
+    ];
+
+    // Synchronize Input -> Certificate and vice versa
+    fieldBindings.forEach(binding => {
+      const inputEl = document.getElementById(binding.input);
+      const certEl = document.getElementById(binding.cert);
+
+      if (inputEl && certEl) {
+        inputEl.addEventListener('input', (e) => {
+          certEl.innerText = e.target.value;
+          if (binding.input === 'inputRecipient') updateDocumentTitle(e.target.value);
+        });
+
+        // Two-way sync from direct inline edit
+        certEl.addEventListener('input', () => {
+          inputEl.value = certEl.innerText;
+          if (binding.input === 'inputRecipient') updateDocumentTitle(certEl.innerText);
+        });
+      }
+    });
+
+    updateDocumentTitle(document.getElementById('inputRecipient')?.value);
+
+    // Stamp Curved Text bindings
+    const inputStampTop = document.getElementById('inputStampTop');
+    const certStampTopPath = document.getElementById('certStampTopPath');
+    if (inputStampTop && certStampTopPath) {
+      inputStampTop.addEventListener('input', (e) => {
+        certStampTopPath.textContent = e.target.value.toUpperCase();
+      });
+    }
+
+    const inputStampBottom = document.getElementById('inputStampBottom');
+    const certStampBottomPath = document.getElementById('certStampBottomPath');
+    if (inputStampBottom && certStampBottomPath) {
+      inputStampBottom.addEventListener('input', (e) => {
+        certStampBottomPath.textContent = e.target.value.toUpperCase();
+      });
+    }
+
+    // Print Action
+    document.getElementById('printBtn').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Mobile Sidebar Toggle
+    const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+    const editorSidebar = document.getElementById('editorSidebar');
+    if (toggleSidebarBtn && editorSidebar) {
+      toggleSidebarBtn.addEventListener('click', () => {
+        editorSidebar.classList.toggle('hidden');
+      });
+    }
+
+    // Reset Template to Defaults
+    document.getElementById('resetDefaultsBtn').addEventListener('click', () => {
+      const defaults = {
+        inputDate: "20th Sept, 2026",
+        inputRecipient: "Vishal Das",
+        inputSubject: "Warranty Certificate",
+        inputPhone: "8583039601",
+        inputLocation: "Aerocity Mohali",
+        inputServiceType: "anti termite treatment services",
+        inputWarrantyYears: "05 (Five) years",
+        inputStampTop: "ULTRA PROOFING PLUS",
+        inputStampBottom: "AUTHENTIC SEAL",
+        inputStampCenter1: "Aerocity",
+        inputStampCenter2: "Mohali",
+        inputVendorContext: "We are here to inform you that we provide termite control services in northern parts of India."
+      };
+
+      for (const [key, val] of Object.entries(defaults)) {
+        const input = document.getElementById(key);
+        if (input) input.value = val;
+      }
+
+      document.getElementById('certDate').innerText = defaults.inputDate;
+      document.getElementById('certRecipient').innerText = defaults.inputRecipient;
+      document.getElementById('certSubject').innerText = defaults.inputSubject;
+      document.getElementById('certPhone').innerText = defaults.inputPhone;
+      document.getElementById('certLocation').innerText = defaults.inputLocation;
+      document.getElementById('certServiceType').innerText = defaults.inputServiceType;
+      document.getElementById('certWarrantyYears').innerText = defaults.inputWarrantyYears;
+      document.getElementById('certVendorContext').innerText = defaults.inputVendorContext;
+      document.getElementById('certStampTopPath').textContent = defaults.inputStampTop;
+      document.getElementById('certStampBottomPath').textContent = defaults.inputStampBottom;
+      document.getElementById('certStampCenter1').textContent = defaults.inputStampCenter1;
+      document.getElementById('certStampCenter2').textContent = defaults.inputStampCenter2;
+      updateDocumentTitle(defaults.inputRecipient);
+    });
+  </script>
+</body>
+</html>
