@@ -12,6 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- PDF export (real A4 file — avoids broken iOS/Android print CSS) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     body {
@@ -23,7 +26,7 @@
       font-family: 'Montserrat', sans-serif;
     }
 
-    /* Exact A4 dimensions for preview and printing */
+    /* Exact A4 dimensions for on-screen preview */
     .a4-sheet {
       width: 210mm;
       min-height: 297mm;
@@ -35,38 +38,40 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      page-break-after: always;
       box-sizing: border-box;
     }
 
-    /* Print optimization */
+    /* Capturing for PDF — flat white sheet, no editor chrome */
+    .a4-sheet.pdf-capture {
+      box-shadow: none !important;
+    }
+    .a4-sheet.pdf-capture [contenteditable] {
+      outline: none !important;
+      background: transparent !important;
+    }
+
+    /* Optional browser print fallback (desktop only) */
     @media print {
       @page {
         size: A4 portrait;
         margin: 0;
       }
-      body {
-        background: transparent !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
       .no-print {
         display: none !important;
+      }
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
       }
       .a4-container {
         padding: 0 !important;
         margin: 0 !important;
-        background: transparent !important;
-        display: block !important;
+        background: #fff !important;
       }
       .a4-sheet {
-        width: 210mm !important;
-        height: 297mm !important;
-        min-height: 297mm !important;
-        max-height: 297mm !important;
         box-shadow: none !important;
         margin: 0 !important;
-        border: none !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
@@ -141,9 +146,9 @@
         <span>Reset Defaults</span>
       </button>
 
-      <button id="printBtn" class="px-5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-sky-500/25 flex items-center gap-2 transition active:scale-95">
-        <i data-lucide="printer" class="w-4 h-4"></i>
-        <span>Print / Save as PDF</span>
+      <button id="printBtn" class="px-5 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-sky-500/25 flex items-center gap-2 transition active:scale-95 disabled:opacity-60 disabled:pointer-events-none">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        <span id="printBtnLabel">Download PDF</span>
       </button>
     </div>
   </header>
@@ -501,9 +506,21 @@
         <!-- Bottom Flowing Waves -->
         <div class="relative w-full h-[75px] overflow-hidden -mt-1">
           <svg class="w-full h-full" viewBox="0 0 794 75" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <!-- Own defs: cross-SVG url(#…) fills break in html2canvas / iOS PDF capture -->
+            <defs>
+              <linearGradient id="waveGradBottomAccent" x1="0%" y1="0%" x2="100%" y2="60%">
+                <stop offset="0%" stop-color="#38bdf8" />
+                <stop offset="100%" stop-color="#0284c7" />
+              </linearGradient>
+              <linearGradient id="waveGradBottomPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0284c7" />
+                <stop offset="60%" stop-color="#0369a1" />
+                <stop offset="100%" stop-color="#075985" />
+              </linearGradient>
+            </defs>
             <!-- Left-to-Right Bottom Blue Sweeps -->
-            <path d="M 0,75 L 794,75 L 794,10 C 670,55 510,60 370,38 C 230,16 110,32 0,60 Z" fill="url(#waveGradAccent)" />
-            <path d="M 0,75 L 794,75 L 794,28 C 630,65 470,65 310,42 C 170,24 70,38 0,75 Z" fill="url(#waveGradPrimary)" />
+            <path d="M 0,75 L 794,75 L 794,10 C 670,55 510,60 370,38 C 230,16 110,32 0,60 Z" fill="url(#waveGradBottomAccent)" />
+            <path d="M 0,75 L 794,75 L 794,28 C 630,65 470,65 310,42 C 170,24 70,38 0,75 Z" fill="url(#waveGradBottomPrimary)" />
           </svg>
         </div>
 
@@ -573,9 +590,170 @@
       });
     }
 
-    // Print Action
-    document.getElementById('printBtn').addEventListener('click', () => {
-      window.print();
+    // Real solution: rasterize the A4 sheet into a true single-page A4 PDF.
+    // Browser print CSS cannot reliably do full-bleed A4 on iOS/Android.
+    const buildCertificatePdf = async () => {
+      const sheet = document.getElementById('certificateSheet');
+      if (!sheet) throw new Error('Certificate sheet not found');
+      if (typeof html2canvas !== 'function' || !window.jspdf?.jsPDF) {
+        throw new Error('PDF libraries failed to load');
+      }
+
+      // Off-screen full-size clone so mobile viewport / overflow can't crop the capture
+      const mount = document.createElement('div');
+      mount.setAttribute('aria-hidden', 'true');
+      mount.style.cssText = [
+        'position:fixed',
+        'left:-10000px',
+        'top:0',
+        'width:210mm',
+        'height:297mm',
+        'overflow:hidden',
+        'background:#ffffff',
+        'z-index:-1',
+        'pointer-events:none'
+      ].join(';');
+
+      const clone = sheet.cloneNode(true);
+      clone.removeAttribute('id');
+      clone.classList.add('a4-sheet', 'pdf-capture');
+      clone.style.cssText = [
+        'width:210mm',
+        'height:297mm',
+        'min-height:297mm',
+        'max-height:297mm',
+        'margin:0',
+        'box-shadow:none',
+        'transform:none',
+        'position:relative'
+      ].join(';');
+      clone.querySelectorAll('[contenteditable]').forEach((el) => {
+        el.removeAttribute('contenteditable');
+        el.style.outline = 'none';
+        el.style.background = 'transparent';
+      });
+
+      // Uniquify SVG paint/path IDs so url(#…) / href resolve inside the clone
+      // (duplicate IDs with the live sheet break footer waves on mobile capture)
+      const idMap = new Map();
+      clone.querySelectorAll('[id]').forEach((el) => {
+        const oldId = el.id;
+        if (!oldId) return;
+        const newId = `pdf_${oldId}_${Math.random().toString(36).slice(2, 8)}`;
+        idMap.set(oldId, newId);
+        el.id = newId;
+      });
+      const rewriteUrl = (value) => {
+        if (!value) return value;
+        return value.replace(/url\(#([^)]+)\)/g, (_, id) => {
+          const next = idMap.get(id);
+          return next ? `url(#${next})` : `url(#${id})`;
+        });
+      };
+      clone.querySelectorAll('*').forEach((el) => {
+        ['fill', 'stroke', 'href', 'xlink:href'].forEach((attr) => {
+          const val = el.getAttribute(attr);
+          if (!val) return;
+          if (attr === 'href' || attr === 'xlink:href') {
+            if (val.startsWith('#')) {
+              const next = idMap.get(val.slice(1));
+              if (next) el.setAttribute(attr, `#${next}`);
+            }
+            return;
+          }
+          if (val.includes('url(')) el.setAttribute(attr, rewriteUrl(val));
+        });
+      });
+
+      mount.appendChild(clone);
+      document.body.appendChild(mount);
+
+      // Keep capture under iOS Safari canvas area limits (~A4 @ 2x is safe)
+      const scale = Math.min(2, window.devicePixelRatio || 2);
+
+      try {
+        // Wait a frame so layout settles at full A4 size
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+        const canvas = await html2canvas(clone, {
+          scale,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          logging: false,
+          width: clone.offsetWidth,
+          height: clone.offsetHeight,
+          windowWidth: clone.scrollWidth,
+          windowHeight: clone.scrollHeight,
+          scrollX: 0,
+          scrollY: 0
+        });
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+          compress: true
+        });
+
+        // Full-bleed: image covers the entire A4 page (0 margin)
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+
+        return pdf;
+      } finally {
+        mount.remove();
+      }
+    };
+
+    const downloadOrSharePdf = async (pdf) => {
+      const client = (document.getElementById('inputRecipient')?.value || 'Client').trim();
+      const safeName = client.replace(/[^\w\-]+/g, '_').replace(/^_+|_+$/g, '') || 'Client';
+      const filename = `${safeName}_Warranty_Certificate.pdf`;
+      const blob = pdf.output('blob');
+      const file = new File([blob], filename, { type: 'application/pdf' });
+
+      // Prefer native share on phones (opens iOS share sheet → Save / Print / AirDrop)
+      const canShareFile = typeof navigator.canShare === 'function'
+        && navigator.canShare({ files: [file] });
+
+      if (canShareFile) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: `${client} - Warranty Certificate`
+          });
+          return;
+        } catch (err) {
+          // User cancelled share — don't fall through to a second download
+          if (err && err.name === 'AbortError') return;
+        }
+      }
+
+      // Desktop / fallback: trigger a real file download
+      pdf.save(filename);
+    };
+
+    document.getElementById('printBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('printBtn');
+      const label = document.getElementById('printBtnLabel');
+      const prevLabel = label?.textContent || 'Download PDF';
+
+      btn.disabled = true;
+      if (label) label.textContent = 'Generating…';
+
+      try {
+        const pdf = await buildCertificatePdf();
+        await downloadOrSharePdf(pdf);
+      } catch (err) {
+        console.error(err);
+        alert('Could not generate the PDF. Please check your connection and try again.');
+      } finally {
+        btn.disabled = false;
+        if (label) label.textContent = prevLabel;
+        lucide.createIcons();
+      }
     });
 
     // Mobile Sidebar Toggle
